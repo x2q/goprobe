@@ -13,7 +13,7 @@ import (
 	"bytes"
 	"io/ioutil"
 
-	"github.com/sidepelican/goprobe/probe"
+	"github.com/x2q/goprobe/probe"
 	"github.com/BurntSushi/toml"
 	//"github.com/lestrrat/go-file-rotatelogs"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
