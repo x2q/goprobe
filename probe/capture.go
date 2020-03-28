@@ -25,6 +25,22 @@ func FindAndNewProbeSource() (*ProbeSource, error) {
 	return NewProbeSource("")
 }
 
+func Dot11ParseIDSSID(packet gopacket.Packet) (string) {
+	for _, layer := range packet.Layers() {
+		if layer.LayerType() == layers.LayerTypeDot11InformationElement {
+			dot11info, ok := layer.(*layers.Dot11InformationElement)
+			if ok && dot11info.ID == layers.Dot11InformationElementIDSSID {
+				if len(dot11info.Info) == 0 {
+					return "<hidden>"
+				}
+				return string(dot11info.Info)
+			}
+		}
+	}
+
+	return ""
+}
+
 func NewProbeSource(device string) (*ProbeSource, error) {
 
 	var handle *pcap.Handle
@@ -64,6 +80,7 @@ func NewProbeSource(device string) (*ProbeSource, error) {
 					Mac:        dot11.Address2.String(),
 					Rssi:       int(radioTap.DBMAntennaSignal),
 					SequenceId: int(dot11.SequenceNumber),
+					SsId:				Dot11ParseIDSSID(packet),
 				}
 			case <-source.stop:
 				break
@@ -92,7 +109,7 @@ func openAvailableMonitorModeInterface() (*pcap.Handle, error) {
 			} else {
 				errs += fmt.Sprintf("%s:\n %v\n", iface.Name, err)
 			}
-			
+
 			continue
 		}
 		log.Println("used interface:", iface.Name)
